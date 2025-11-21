@@ -1,0 +1,31 @@
+# {{ project_name }} - Generated Makefile
+# Generated with python-project-template (Copier)
+# https://github.com/{{ github_username }}/{{ project_slug }}
+
+.DEFAULT_GOAL := help
+
+# Include modular Makefile components
+-include .makefiles/common.mk
+-include .makefiles/quality.mk
+{% if use_testing -%}
+-include .makefiles/testing.mk
+{% endif -%}
+-include .makefiles/deps.mk
+{% if use_release_automation -%}
+-include .makefiles/release.mk
+{% endif -%}
+
+# Project-specific variables (customize as needed)
+PROJECT_NAME := {{ project_slug }}
+PYTHON_VERSION := {{ python_version }}
+
+# Project-specific targets can be added below
+# Example:
+# .PHONY: custom-target
+# custom-target: ## Run custom project task
+# 	@echo "Running custom task"
+
+help: ## Show this help message
+	@echo "$(BLUE){{ project_name }} - Available targets:$(NC)"
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
+		awk 'BEGIN {FS = ":.*?## "}; {printf "  $(GREEN)%-20s$(NC) %s\n", $$1, $$2}'

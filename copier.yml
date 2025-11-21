@@ -1,0 +1,58 @@
+# Copier template configuration for Python projects with enhanced Makefile
+_min_copier_version: "9.0.0"
+
+# Template questions
+project_name:
+  type: str
+  help: "Project name (human-readable)"
+  placeholder: "My Awesome Project"
+
+project_slug:
+  type: str
+  default: "{{ project_name|lower|replace(' ', '-')|replace('_', '-') }}"
+  help: "Project slug (for URLs, package name)"
+
+project_description:
+  type: str
+  help: "Short project description"
+  placeholder: "A Python project with comprehensive Makefile"
+
+python_version:
+  type: str
+  default: "3.11"
+  help: "Minimum Python version"
+  choices:
+    - "3.10"
+    - "3.11"
+    - "3.12"
+    - "3.13"
+
+use_testing:
+  type: bool
+  default: true
+  help: "Include testing targets (pytest, coverage)?"
+
+use_release_automation:
+  type: bool
+  default: true
+  help: "Include release management (version bumping, publishing)?"
+
+use_docker:
+  type: bool
+  default: false
+  help: "Include Docker-related targets?"
+
+github_username:
+  type: str
+  help: "GitHub username or organization"
+  placeholder: "your-username"
+
+author_name:
+  type: str
+  help: "Author name"
+  placeholder: "Your Name"
+
+author_email:
+  type: str
+  help: "Author email"
+  placeholder: "you@example.com"

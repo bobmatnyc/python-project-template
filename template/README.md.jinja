@@ -1,0 +1,86 @@
+# {{ project_name }}
+
+{{ project_description }}
+
+## Quick Start
+
+### Installation
+
+```bash
+# Install in development mode
+make install
+
+# Or with pip
+pip install -e .
+```
+
+### Development
+
+```bash
+# Run quality checks
+make quality
+
+# Run tests
+make test
+
+# Auto-fix linting issues
+make lint-fix
+```
+
+## Available Make Targets
+
+Run `make help` to see all available targets.
+
+### Key Targets
+
+- `make install` - Install project in development mode
+- `make quality` - Run all quality checks (lint + type-check)
+- `make test` - Run test suite with coverage
+- `make lint-fix` - Auto-fix linting issues
+{% if use_release_automation -%}
+- `make patch` - Bump patch version and release
+- `make minor` - Bump minor version and release
+- `make major` - Bump major version and release
+{% endif -%}
+
+## Project Structure
+
+```
+{{ project_slug }}/
+├── Makefile           # Build automation
+├── .makefiles/        # Modular Makefile components
+├── pyproject.toml     # Project configuration
+├── src/               # Source code
+├── tests/             # Test suite
+└── scripts/           # Automation scripts
+```
+
+## Requirements
+
+- Python {{ python_version }}+
+{% if use_testing -%}
+- pytest (for testing)
+{% endif -%}
+- ruff (for linting)
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/my-feature`
+3. Make changes and test: `make quality && make test`
+4. Commit: `git commit -m "feat: add my feature"`
+5. Push: `git push origin feature/my-feature`
+6. Create Pull Request
+
+## License
+
+MIT License - see LICENSE file for details.
+
+## Author
+
+{{ author_name }} <{{ author_email }}>
+
+## Links
+
+- Repository: https://github.com/{{ github_username }}/{{ project_slug }}
+- Issues: https://github.com/{{ github_username }}/{{ project_slug }}/issues
