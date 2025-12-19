@@ -7,7 +7,7 @@
 # Extracted from: claude-mpm production Makefile (97 targets)
 # Dependencies: common.mk (for colors, VERSION, PYTHON, ENV)
 #               quality.mk (for pre-publish checks)
-# Last updated: 2025-11-21
+# Last updated: 2025-12-19
 # ============================================================================
 
 # ============================================================================
@@ -27,6 +27,7 @@ release-check: ## Check if environment is ready for release
 	@echo "$(YELLOW)🔍 Checking release prerequisites...$(NC)"
 	@echo "Checking required tools..."
 	@command -v git >/dev/null 2>&1 || (echo "$(RED)✗ git not found$(NC)" && exit 1)
+	@command -v uv >/dev/null 2>&1 || (echo "$(RED)✗ uv not found$(NC)" && exit 1)
 	@command -v $(PYTHON) >/dev/null 2>&1 || (echo "$(RED)✗ python not found$(NC)" && exit 1)
 	@command -v gh >/dev/null 2>&1 || (echo "$(RED)✗ GitHub CLI not found. Install from: https://cli.github.com/$(NC)" && exit 1)
 	@echo "$(GREEN)✓ All required tools found$(NC)"
@@ -99,7 +100,7 @@ patch: ## Bump patch version (X.Y.Z+1)
 		exit 1; \
 	fi
 	@CURRENT=$$(cat $(VERSION_FILE)); \
-	NEW=$$($(PYTHON) -c "import semver; print(semver.VersionInfo.parse('$$CURRENT').bump_patch())"); \
+	NEW=$$(uv run python -c "import semver; print(semver.VersionInfo.parse('$$CURRENT').bump_patch())"); \
 	echo "$$NEW" > $(VERSION_FILE); \
 	echo "$(GREEN)✓ Version bumped: $$CURRENT → $$NEW$(NC)"
 
@@ -110,7 +111,7 @@ minor: ## Bump minor version (X.Y+1.0)
 		exit 1; \
 	fi
 	@CURRENT=$$(cat $(VERSION_FILE)); \
-	NEW=$$($(PYTHON) -c "import semver; print(semver.VersionInfo.parse('$$CURRENT').bump_minor())"); \
+	NEW=$$(uv run python -c "import semver; print(semver.VersionInfo.parse('$$CURRENT').bump_minor())"); \
 	echo "$$NEW" > $(VERSION_FILE); \
 	echo "$(GREEN)✓ Version bumped: $$CURRENT → $$NEW$(NC)"
 
@@ -121,7 +122,7 @@ major: ## Bump major version (X+1.0.0)
 		exit 1; \
 	fi
 	@CURRENT=$$(cat $(VERSION_FILE)); \
-	NEW=$$($(PYTHON) -c "import semver; print(semver.VersionInfo.parse('$$CURRENT').bump_major())"); \
+	NEW=$$(uv run python -c "import semver; print(semver.VersionInfo.parse('$$CURRENT').bump_major())"); \
 	echo "$$NEW" > $(VERSION_FILE); \
 	echo "$(GREEN)✓ Version bumped: $$CURRENT → $$NEW$(NC)"
 
@@ -133,9 +134,9 @@ release-build: pre-publish ## Build Python package for release (runs quality che
 	@echo "$(YELLOW)📦 Building package...$(NC)"
 	@$(MAKE) build-metadata
 	@rm -rf $(DIST_DIR)/ $(BUILD_DIR)/ *.egg-info
-	@$(PYTHON) -m build $(BUILD_FLAGS)
+	@uv run python -m build $(BUILD_FLAGS)
 	@if command -v twine >/dev/null 2>&1; then \
-		twine check $(DIST_DIR)/*; \
+		uv run twine check $(DIST_DIR)/*; \
 		echo "$(GREEN)✓ Package validation passed$(NC)"; \
 	else \
 		echo "$(YELLOW)⚠ twine not found, skipping package validation$(NC)"; \
@@ -174,7 +175,7 @@ release-publish: ## Publish release to PyPI and create GitHub release
 	fi
 	@echo "$(YELLOW)📤 Publishing to PyPI...$(NC)"
 	@if command -v twine >/dev/null 2>&1; then \
-		$(PYTHON) -m twine upload $(DIST_DIR)/*; \
+		uv run twine upload $(DIST_DIR)/*; \
 		echo "$(GREEN)✓ Published to PyPI$(NC)"; \
 	else \
 		echo "$(RED)✗ twine not found. Install with: pip install twine$(NC)"; \
@@ -192,7 +193,7 @@ release-publish: ## Publish release to PyPI and create GitHub release
 release-test-pypi: release-build ## Publish to TestPyPI for testing
 	@echo "$(YELLOW)🧪 Publishing to TestPyPI...$(NC)"
 	@if command -v twine >/dev/null 2>&1; then \
-		$(PYTHON) -m twine upload --repository testpypi $(DIST_DIR)/*; \
+		uv run twine upload --repository testpypi $(DIST_DIR)/*; \
 		echo "$(GREEN)✓ Published to TestPyPI$(NC)"; \
 		echo "$(BLUE)Test install: pip install --index-url https://test.pypi.org/simple/ <package-name>$(NC)"; \
 	else \
@@ -233,7 +234,7 @@ release-dry-run: ## Show what a patch release would do (dry run)
 	@echo ""
 	@echo "$(BLUE)Current version:$(NC) $$(cat $(VERSION_FILE) 2>/dev/null || echo 'unknown')"
 	@if [ -f "$(VERSION_FILE)" ]; then \
-		NEXT=$$($(PYTHON) -c "import semver; print(semver.VersionInfo.parse('$$(cat $(VERSION_FILE))').bump_patch())" 2>/dev/null || echo "unknown"); \
+		NEXT=$$(uv run python -c "import semver; print(semver.VersionInfo.parse('$$(cat $(VERSION_FILE))').bump_patch())" 2>/dev/null || echo "unknown"); \
 		echo "$(BLUE)Next patch version would be:$(NC) $$NEXT"; \
 	fi
 
